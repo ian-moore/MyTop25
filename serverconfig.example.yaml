@@ -1,0 +1,5 @@
+SpotifyClientId: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+SpotifyClientSecret: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+SpotifyRedirectUri: http://yourdomain/oauth
+AzureStorageConnectionString: UseDevelopmentStorage=true;
+AzureStorageTableName: name

@@ -1,0 +1,13 @@
+FSharp.Azure.Storage
+FSharp.Core
+FSharp.Data
+FSPowerPack.Core.Community
+FSPowerPack.Linq.Community
+Microsoft.Data.Edm
+Microsoft.Data.OData
+Microsoft.Data.Services.Client
+Microsoft.WindowsAzure.ConfigurationManager
+Newtonsoft.Json
+Suave
+System.Spatial
+WindowsAzure.Storage
