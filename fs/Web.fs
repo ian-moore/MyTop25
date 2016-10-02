@@ -66,7 +66,7 @@ let app settings =
         >> copyIdToStore ctx
 
     choose [
-        path "/" >=> Successful.OK "Hello spotify user! <a href='/login'>Login</a>"
+        path "/" >=> Files.file "views/index.html"
         path "/login" >=> Redirection.redirect authUrl
         path "/logout" >=> clearAuth >=> Redirection.redirect "/"
         path "/oauth" >=> statefulForSession >=> context (fun ctx ->
@@ -79,7 +79,7 @@ let app settings =
             | _, Choice1Of2 error -> RequestErrors.UNAUTHORIZED error
         )
         verifyAuth <| choose [
-            path "/view" >=> statefulForSession >=> Successful.OK "Only if you are logged in! <a href='/logout'>Logout</a>"
+            path "/view" >=> statefulForSession >=> Files.file "views/artists.html"
             path "/api/artists" >=> statefulForSession >=> context (fun ctx ->
                 match readIdFromStore ctx with
                 | None -> RequestErrors.BAD_REQUEST "No spotify id was found."

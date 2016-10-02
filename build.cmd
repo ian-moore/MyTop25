@@ -1,4 +1,4 @@
-::@echo off
+@echo off
 SETLOCAL
 
 .paket\paket.bootstrapper.exe
