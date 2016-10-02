@@ -78,6 +78,7 @@ let app settings =
                 >=> Redirection.redirect "/view"
             | _, Choice1Of2 error -> RequestErrors.UNAUTHORIZED error
         )
+        pathScan "content/%s" Files.file
         verifyAuth <| choose [
             path "/view" >=> statefulForSession >=> Files.file "views/artists.html"
             path "/api/artists" >=> statefulForSession >=> context (fun ctx ->

@@ -2,9 +2,10 @@
 
 open Fake
 open Fake.FileHelper
+open Fake.NpmHelper
 
 let projectDir = __SOURCE_DIRECTORY__
-let outputDir = projectDir </> "build"
+let outputDir = projectDir </> "dist"
 let fsDir = projectDir </> "fs"
 let jsDir = projectDir </> "js"
 
@@ -13,7 +14,8 @@ Target "Clean" (fun _ ->
 )
 
 Target "Restore" (fun _ ->
-    trace "NPM here"
+    // paket restore runs from the cmd script so fake can run
+    Npm (fun p -> { p with Command = Install Standard })
 )
 
 Target "Build" (fun _ ->
@@ -22,7 +24,9 @@ Target "Build" (fun _ ->
         outputDir
         "Build"
         ["Configuration", "Debug"]
-    |> Log "Build Output: "
+    |> Log "MSBuild: "
+
+    Npm (fun p -> { p with Command = Run "build" })
 )
 
 Target "Copy Files" (fun _ ->
@@ -30,8 +34,9 @@ Target "Copy Files" (fun _ ->
 )
 
 Target "Run" (fun _ ->
+    trace "Starting application on localhost..."
     let b, msg = FSIHelper.executeFSI projectDir "server.fsx" []
-    msg |> Seq.iter (fun m -> printfn "%A" m)
+    msg |> Seq.iter (fun m -> printfn "%A" m.Message)
 )
 
 Target "Default" DoNothing
@@ -41,6 +46,5 @@ Target "Default" DoNothing
     ==> "Build"
     ==> "Copy Files"
     ==> "Default"
-    ==> "Run"
 
 RunTargetOrDefault "Default"
