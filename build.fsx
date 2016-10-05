@@ -5,7 +5,7 @@ open Fake.FileHelper
 open Fake.NpmHelper
 
 let projectDir = __SOURCE_DIRECTORY__
-let outputDir = projectDir </> "dist"
+let outputDir = projectDir </> "bin"
 let fsDir = projectDir </> "fs"
 let jsDir = projectDir </> "js"
 
@@ -29,10 +29,6 @@ Target "Build" (fun _ ->
     Npm (fun p -> { p with Command = Run "build" })
 )
 
-Target "Copy Files" (fun _ ->
-    CopyDir (outputDir </> "views") (projectDir </> "views") allFiles
-)
-
 Target "Run" (fun _ ->
     trace "Starting application on localhost..."
     let b, msg = FSIHelper.executeFSI projectDir "server.fsx" []
@@ -44,7 +40,6 @@ Target "Default" DoNothing
 "Clean"
     ==> "Restore"
     ==> "Build"
-    ==> "Copy Files"
     ==> "Default"
 
 RunTargetOrDefault "Default"

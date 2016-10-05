@@ -268,4 +268,4 @@ __pycache__/
 serverconfig.yaml
 
 # Project build output
-dist/
+content/

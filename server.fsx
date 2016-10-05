@@ -1,6 +1,6 @@
 #r "packages/FSharp.Configuration/lib/net40/FSharp.Configuration.dll"
 #r "packages/Suave/lib/net40/Suave.dll"
-#r "dist/MyTop25.dll"
+#r "bin/MyTop25.dll"
 
 open FSharp.Configuration
 open MyTop25.Web

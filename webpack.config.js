@@ -5,7 +5,7 @@ module.exports = {
     devtool: 'source-map',
     entry: './js/app.jsx',
     output: {
-        path: path.join(__dirname, 'dist', 'content'),
+        path: path.join(__dirname, 'content'),
         filename: 'app.js'
     },
     module: {
