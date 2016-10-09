@@ -3,7 +3,7 @@ var path = require('path'),
 
 module.exports = {
     devtool: 'source-map',
-    entry: './js/app.jsx',
+    entry: ['whatwg-fetch', './js/app.jsx'],
     output: {
         path: path.join(__dirname, 'content'),
         filename: 'app.js'
