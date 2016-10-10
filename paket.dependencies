@@ -1,6 +1,7 @@
 source https://www.nuget.org/api/v2/
 framework >= net452
 
+nuget Chiron
 nuget Fake
 nuget FSharp.Azure.Storage 2.1.0
 nuget FSharp.Configuration 0.6.2

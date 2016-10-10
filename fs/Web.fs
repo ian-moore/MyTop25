@@ -24,8 +24,8 @@ let httpGet url requestHeaders =
 
 let verifyAuth protectedPart = 
     Authentication.authenticate Cookie.CookieLife.Session false
-        (fun () -> Choice2Of2 <| RequestErrors.FORBIDDEN "Not recognized.")
-        (fun _ ->  Choice2Of2 <| RequestErrors.FORBIDDEN "Authentication is invalid.")
+        (fun () -> Choice2Of2 <| Redirection.redirect "/login")
+        (fun _ ->  Choice2Of2 <| Redirection.redirect "/login")
         protectedPart
 
 let clearAuth =
@@ -57,6 +57,29 @@ let readIdFromStore ctx =
     | None -> None
     | Some store -> store.get "spotify-id"
 
+let serializeArtists (artists: Spotify.TopArtists.Root) (user: Spotify.SpotifyUser.Root) =
+    let jsonProps = Map.ofList >> Chiron.Object
+    artists.Items
+    |> Array.sortBy (fun x -> x.Popularity)
+    |> Array.fold (fun (a, m) x -> x.Id::a, m |> Map.add x.Id x ) (List.empty, Map.empty)
+    |> (fun (ids, artists) -> 
+        jsonProps [
+            "topIds", Chiron.Array (ids |> List.rev |> List.map Chiron.String)
+            "artists", artists |> Map.map (fun k a ->
+                jsonProps [
+                    "name", Chiron.String a.Name
+                    "externalUrl", Chiron.String a.ExternalUrls.Spotify
+                    "imageUrl", Chiron.String (a.Images 
+                        |> Array.map (fun i -> i.Url)
+                        |> Array.head)
+                ]) |> Chiron.Object
+            "userDisplayName", Chiron.String user.DisplayName
+            "userImage", Chiron.String (user.Images 
+                |> Array.map (fun i -> i.Url) 
+                |> Array.head)
+        ])
+    |> Chiron.Formatting.Json.format
+
 let app settings =
     let storage = StorageClient (settings.AzureConnection, settings.AzureTable)
     let authUrl = Spotify.buildAuthUrl settings.ClientId settings.RedirectUri settings.Scope ""
@@ -65,11 +88,11 @@ let app settings =
         >> storeAuthTokens storage
         >> copyIdToStore ctx
 
-    choose [
+    statefulForSession >=> choose [
         path "/" >=> Files.file "views/index.html"
         path "/login" >=> Redirection.redirect authUrl
         path "/logout" >=> clearAuth >=> Redirection.redirect "/"
-        path "/oauth" >=> statefulForSession >=> context (fun ctx ->
+        path "/oauth" >=> context (fun ctx ->
             let req = ctx.request
             match (req.queryParam "code", req.queryParam "error") with
             | Choice1Of2 code, _ ->
@@ -80,16 +103,17 @@ let app settings =
         )
         pathScan "/content/%s" (sprintf "content/%s" >> Files.file)
         verifyAuth <| choose [
-            path "/view" >=> statefulForSession >=> Files.file "views/artists.html"
-            path "/api/artists" >=> statefulForSession >=> context (fun ctx ->
+            path "/view" >=> Files.file "views/artists.html"
+            path "/api/artists" >=> context (fun ctx ->
                 match readIdFromStore ctx with
                 | None -> RequestErrors.BAD_REQUEST "No spotify id was found."
                 | Some id -> 
                     let user, metadata = storage.findUser id
                     let artists = httpGet |> Spotify.getTopArtists user.AccessToken Spotify.MediumTerm
-                    artists.Items 
-                    |> Array.fold (fun s i -> sprintf "%s, %s" i.Name s) "" 
+                    let spotifyUser = httpGet |> Spotify.requestUser user.AccessToken
+                    serializeArtists artists spotifyUser
                     |> Successful.OK
+                    >=> Writers.setMimeType "application/json; charset=utf-8"
             )
         ]
         RequestErrors.NOT_FOUND "Not found."

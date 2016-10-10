@@ -2,10 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import classNames from 'classnames'
 import 'whatwg-fetch'
-import Header from './header.jsx'
-import ArtistList from './artistlist.jsx'
-import DurationPicker from './durationpicker.jsx'
 import LoadingIndicator from './loadingindicator.jsx'
+import ArtistView from './artistview.jsx'
 
 const defaultState = {
     user: {},
@@ -22,8 +20,8 @@ class App extends React.Component {
         this.fetchData = this.fetchData.bind(this);
     }
     fetchData() {
-        fetch('/api/artists')
-            .then((response) => { response.json(); })
+        fetch('/api/artists', { credentials: 'same-origin' })
+            .then((response) => { return response.json(); })
             .then((json) => {
                 console.dir(json);
             });
@@ -33,17 +31,10 @@ class App extends React.Component {
     }
     render() {
         var orderedArtists = this.state.artistOrder.map(id => this.state.artists[id]);
-        var mainClass = classNames({
-            'hidden': this.state.isLoading
-        });
         return (
             <div className="container">
                 <LoadingIndicator display={this.state.isLoading} />
-                <div className={mainClass}>
-                    <Header name="Ian" />
-                    <DurationPicker />
-                    <ArtistList artists={orderedArtists} />
-                </div>
+                <ArtistView display={!this.state.isLoading} artists={orderedArtists} />
             </div>
         )
     }
