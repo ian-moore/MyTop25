@@ -11,8 +11,8 @@ class ArtistView extends React.Component {
         });
         return (
             <div className={viewClasses}>
-                <Header name="Ian" />
-                <DurationPicker />
+                <Header name={this.props.user.name} />
+                <DurationPicker onChange={this.props.onDurationChanged} />
                 <ArtistList artists={this.props.artists} />
             </div>
         )

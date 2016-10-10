@@ -60,13 +60,13 @@ let readIdFromStore ctx =
 let serializeArtists (artists: Spotify.TopArtists.Root) (user: Spotify.SpotifyUser.Root) =
     let jsonProps = Map.ofList >> Chiron.Object
     artists.Items
-    |> Array.sortBy (fun x -> x.Popularity)
-    |> Array.fold (fun (a, m) x -> x.Id::a, m |> Map.add x.Id x ) (List.empty, Map.empty)
+    |> Array.fold (fun (a, m) x -> x.Id::a, m |> Map.add x.Id x) (List.empty, Map.empty)
     |> (fun (ids, artists) -> 
         jsonProps [
             "topIds", Chiron.Array (ids |> List.rev |> List.map Chiron.String)
             "artists", artists |> Map.map (fun k a ->
                 jsonProps [
+                    "id", Chiron.String a.Id
                     "name", Chiron.String a.Name
                     "externalUrl", Chiron.String a.ExternalUrls.Spotify
                     "imageUrl", Chiron.String (a.Images 
@@ -79,6 +79,13 @@ let serializeArtists (artists: Spotify.TopArtists.Root) (user: Spotify.SpotifyUs
                 |> Array.head)
         ])
     |> Chiron.Formatting.Json.format
+
+let buildArtistResponse duration (user, metadata) = 
+    let artists = httpGet |> Spotify.getTopArtists user.AccessToken duration
+    let spotifyUser = httpGet |> Spotify.requestUser user.AccessToken
+    serializeArtists artists spotifyUser
+    |> Successful.OK
+    >=> Writers.setMimeType "application/json; charset=utf-8"
 
 let app settings =
     let storage = StorageClient (settings.AzureConnection, settings.AzureTable)
@@ -108,12 +115,9 @@ let app settings =
                 match readIdFromStore ctx with
                 | None -> RequestErrors.BAD_REQUEST "No spotify id was found."
                 | Some id -> 
-                    let user, metadata = storage.findUser id
-                    let artists = httpGet |> Spotify.getTopArtists user.AccessToken Spotify.MediumTerm
-                    let spotifyUser = httpGet |> Spotify.requestUser user.AccessToken
-                    serializeArtists artists spotifyUser
-                    |> Successful.OK
-                    >=> Writers.setMimeType "application/json; charset=utf-8"
+                    match ctx.request.queryParam "duration" with
+                    | Choice1Of2 d -> storage.findUser id |> buildArtistResponse (Spotify.parseDuration d)
+                    | Choice2Of2 _ -> storage.findUser id |> buildArtistResponse Spotify.MediumTerm
             )
         ]
         RequestErrors.NOT_FOUND "Not found."

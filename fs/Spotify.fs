@@ -40,7 +40,7 @@ let internal sampleUserResponse = """{
 }"""
 
 [<Literal>]
-let topArtistsUrl = "https://api.spotify.com/v1/me/top/artists?time_range="
+let topArtistsUrl = "https://api.spotify.com/v1/me/top/artists?limit=25&time_range="
 
 [<Literal>]
 let internal sampleTopArtistsResponse = """{
@@ -89,6 +89,13 @@ type TimeRange =
     | LongTerm
     | MediumTerm
     | ShortTerm
+  
+let parseDuration d =
+    match d with 
+    | "long_term" -> LongTerm
+    | "medium_term" -> MediumTerm
+    | "short_term" -> ShortTerm
+    | _ -> MediumTerm
 
 let timeRangeString t =
     match t with

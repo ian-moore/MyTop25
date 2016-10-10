@@ -41,5 +41,6 @@ Target "Default" DoNothing
     ==> "Restore"
     ==> "Build"
     ==> "Default"
+    ==> "Run"
 
 RunTargetOrDefault "Default"

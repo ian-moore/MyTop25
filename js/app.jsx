@@ -9,7 +9,7 @@ const defaultState = {
     user: {},
     artists: {},
     artistOrder: [],
-    duration: 'medium-term',
+    duration: 'medium_term',
     isLoading: true
 }
 
@@ -18,13 +18,29 @@ class App extends React.Component {
         super(props);
         this.state = defaultState;
         this.fetchData = this.fetchData.bind(this);
+        this.durationChanged = this.durationChanged.bind(this);
     }
     fetchData() {
-        fetch('/api/artists', { credentials: 'same-origin' })
+        var url = `/api/artists?duration=${this.state.duration}`
+        fetch(url, { credentials: 'same-origin' })
             .then((response) => { return response.json(); })
             .then((json) => {
-                console.dir(json);
+                this.setState({
+                    user: {
+                        name: json.userDisplayName,
+                        imageUrl: json.userImage,
+                    },
+                    artists: json.artists,
+                    artistOrder: json.topIds,
+                    isLoading: false
+                });
             });
+    }
+    durationChanged(evt) {
+        this.setState({
+            isLoading: true,
+            duration: evt.target.value
+        }, this.fetchData);
     }
     componentDidMount() {
         this.fetchData();
@@ -34,7 +50,10 @@ class App extends React.Component {
         return (
             <div className="container">
                 <LoadingIndicator display={this.state.isLoading} />
-                <ArtistView display={!this.state.isLoading} artists={orderedArtists} />
+                <ArtistView display={!this.state.isLoading} 
+                    user={this.state.user} 
+                    artists={orderedArtists}
+                    onDurationChanged={this.durationChanged} />
             </div>
         )
     }
