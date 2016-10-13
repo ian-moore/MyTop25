@@ -18,4 +18,7 @@ let settings =
     AzureConnection = config.AzureStorageConnectionString
     AzureTable = config.AzureStorageTableName }
 
-app settings |> startWebServer defaultConfig
+let homeDir = System.IO.Path.Combine (__SOURCE_DIRECTORY__, "content")
+let suaveConfig = { defaultConfig with homeFolder = Some homeDir }
+
+app settings |> startWebServer suaveConfig

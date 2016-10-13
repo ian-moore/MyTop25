@@ -108,7 +108,7 @@ let app settings =
                 >=> Redirection.redirect "/view"
             | _, Choice1Of2 error -> RequestErrors.UNAUTHORIZED error
         )
-        pathScan "/content/%s" (sprintf "content/%s" >> Files.file)
+        pathRegex "(.*)\.(css|png|gif|js|ico)" >=> Files.browseHome
         verifyAuth <| choose [
             path "/view" >=> Files.file "views/artists.html"
             path "/api/artists" >=> context (fun ctx ->

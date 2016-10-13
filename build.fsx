@@ -35,11 +35,16 @@ Target "Run" (fun _ ->
     msg |> Seq.iter (fun m -> printfn "%A" m.Message)
 )
 
+Target "CopyFiles" (fun _ ->
+    FileHelper.CopyDir ("content" </> "css") "css" FileHelper.allFiles
+)
+
 Target "Default" DoNothing
 
 "Clean"
     ==> "Restore"
     ==> "Build"
+    ==> "CopyFiles"
     ==> "Default"
     ==> "Run"
 
