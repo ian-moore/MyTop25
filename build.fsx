@@ -37,6 +37,7 @@ Target "Run" (fun _ ->
 
 Target "CopyFiles" (fun _ ->
     FileHelper.CopyDir ("content" </> "css") "css" FileHelper.allFiles
+    FileHelper.CopyDir ("content" </> "img") "img" FileHelper.allFiles
 )
 
 Target "Default" DoNothing

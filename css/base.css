@@ -2,8 +2,19 @@
     display: none; 
 }
 
+.container {
+    width: 800px;
+	max-width: 90%;
+    margin: auto;
+}
+
+h1, h2 {
+    color: #dfe0e6;
+    font-weight: lighter;
+}
+
 body {
     background-color: #1c1c1f;
-    color: #2e2f33;
+    color: #88898c;
     font-family: Helvetica, Arial, sans-serif
 }

@@ -22,6 +22,8 @@ let httpPost url requestBody =
 let httpGet url requestHeaders =
     Http.RequestString (url, headers = requestHeaders)
 
+let getFirstString = Array.tryHead >> (function | Some i -> i | None -> "")
+
 let verifyAuth protectedPart = 
     Authentication.authenticate Cookie.CookieLife.Session false
         (fun () -> Choice2Of2 <| Redirection.redirect "/login")
@@ -69,14 +71,10 @@ let serializeArtists (artists: Spotify.TopArtists.Root) (user: Spotify.SpotifyUs
                     "id", Chiron.String a.Id
                     "name", Chiron.String a.Name
                     "externalUrl", Chiron.String a.ExternalUrls.Spotify
-                    "imageUrl", Chiron.String (a.Images 
-                        |> Array.map (fun i -> i.Url)
-                        |> Array.head)
+                    "imageUrl", Chiron.String (a.Images |> Array.map (fun i -> i.Url) |> getFirstString)
                 ]) |> Chiron.Object
             "userDisplayName", Chiron.String user.DisplayName
-            "userImage", Chiron.String (user.Images 
-                |> Array.map (fun i -> i.Url) 
-                |> Array.head)
+            "userImage", Chiron.String (user.Images |> Array.map (fun i -> i.Url) |> getFirstString)
         ])
     |> Chiron.Formatting.Json.format
 
