@@ -19,3 +19,28 @@ h1 {
     text-align: center;
     margin: 0px;
 }
+
+.duration-picker {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.duration-picker input[type="radio"] {
+    display: none;
+}
+
+.duration-picker label {
+    display:inline-block;
+    background-color:#282828;
+    padding: 6px 15px;
+    width: 170px;
+    font-family:Arial;
+    font-size:16px;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+.duration-picker input[type="radio"]:checked + label { 
+    background-color: #565656;
+    color: #cdcdcd;
+}
