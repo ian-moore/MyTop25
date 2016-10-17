@@ -6,7 +6,8 @@ class ArtistList extends React.Component {
             <div className="artist-collection">
                 {this.props.artists.map((a) => (
                     <div key={a.id} className="artist-item">
-                        <span>{a.name}</span>
+                        <img src={a.imageUrl} width="100" height="100" />
+                        <p className="artist-name">{a.name}</p>
                     </div>
                 ))}
             </div>

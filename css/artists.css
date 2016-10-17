@@ -1,7 +1,21 @@
+h1 {
+    text-align: center;
+}
+
 .artist-item {
     background-color: #2e2f33;
-    width: 120px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     margin: 5px;
     float: left;
+}
+
+.artist-item img {
+    border-radius: 50%;
+    margin: 10px 22px;
+}
+
+.artist-name {
+    text-align: center;
+    margin: 0px;
 }
